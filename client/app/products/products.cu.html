@@ -1,6 +1,6 @@
 <navbar></navbar>
 
-<div class="container">
+<div class="col-md-12">
   <div class="row" ng-if="currentUser.role == 'admin'">
     <div class="text-right">
       <span ng-click="reject()" class="btn btn-danger">Rechazar</span>
@@ -8,7 +8,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-4">
       <div class="col-md-12">
           <form role="form" name="form" ng-submit="submit()" novalidate class="form-validation">
             <fieldset  ng-disabled="disabled">
@@ -51,8 +51,20 @@
               <!-- Text input-->
               <div class="form-group">
                 <label for="photo_name">Foto 1</label>
-                <input ng-model="item.photos[0]['name']" id="photo_name" name="photo_name" type="url" placeholder="Zapatilla h" class="form-control input-md mb-5">
-                <input ng-model="item.photos[0]['url']" id="url" name="url" type="url" placeholder="www.misfotos.com/zapatilla-nike-1.png" class="form-control input-md">
+                <input ng-model="item.ProductImages[0].name" id="photo_name" name="photo_name" type="text" placeholder="Zapatilla h" class="form-control input-md mb-5">
+                <input ng-model="item.ProductImages[0].url" id="url" name="url" type="text" placeholder="www.misfotos.com/zapatilla-nike-1.png" class="form-control input-md">
+              </div>
+              <!-- Text input-->
+              <div class="form-group">
+                <label for="photo_name">Foto 2</label>
+                <input ng-model="item.ProductImages[1]['name']" id="photo_name" name="photo_name" type="text" placeholder="Zapatilla h" class="form-control input-md mb-5">
+                <input ng-model="item.ProductImages[1]['url']" id="url" name="url" type="text" placeholder="www.misfotos.com/zapatilla-nike-2.png" class="form-control input-md">
+              </div>
+              <!-- Text input-->
+              <div class="form-group">
+                <label for="photo_name">Foto 3</label>
+                <input ng-model="item.ProductImages[2]['name']" id="photo_name" name="photo_name" type="text" placeholder="Zapatilla h" class="form-control input-md mb-5">
+                <input ng-model="item.ProductImages[2]['url']" id="url" name="url" type="text" placeholder="www.misfotos.com/zapatilla-nike-3.png" class="form-control input-md">
               </div>
 
               <!-- Button (Double) -->
@@ -65,13 +77,17 @@
           </form>
       </div>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
       <div class="col-md-12">
         <div ng-show="action == 'edit'">
           <rzslider rz-slider-model="slider.minValue"
           rz-slider-high="slider.maxValue"
           rz-slider-options="slider.options"></rzslider>
         </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="col-md-12">
         <div class="cb"></div>
         <div ng-show="action == 'edit'">
         <simple-chat ng-if="user"

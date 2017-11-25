@@ -4,7 +4,7 @@ angular.module('ehApp')
   .controller('MerchantProductsCreateCtrl', function ($scope, $state, ProductsService, Auth) {
     $scope.action = 'create';
     $scope.item = {}
-    $scope.item.photos = []
+    $scope.item.ProductImages = []
     $scope.currentUser = {}
     $scope.disabled = true;
 
@@ -12,8 +12,6 @@ angular.module('ehApp')
       $scope.currentUser = currentUser;
       $scope.disabled = false;
     })
-
-
     $scope.submit = function(){
       $scope.submitted = true;
       if ($scope.form.$valid) {
