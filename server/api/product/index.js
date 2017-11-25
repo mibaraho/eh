@@ -15,5 +15,6 @@ router.put('/products/:id', auth.isAuthenticated(), controller.update);
 router.put('/products/:id/approve', auth.isAuthenticated(), controller.approve);
 router.patch('/products/:id', auth.isAuthenticated(), controller.update);
 router.delete('/products/:id', auth.isAuthenticated(), controller.destroy);
+router.post('/validate', controller.validate);
 
 module.exports = router;
