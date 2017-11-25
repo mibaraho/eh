@@ -241,13 +241,12 @@ function azureProductValidation(){
 
     return Promise.all(promises)
     .then(function(azureProductValidationResults){
-      bundle.validations = [
+      bundle.validations =
         {
           name: azureProductValidationResults[0],
           description: azureProductValidationResults[1],
           imagenValidations: azureProductValidationResults[2]
         }
-      ]
       return bundle
     })
   }

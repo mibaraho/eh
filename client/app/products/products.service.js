@@ -51,6 +51,14 @@ angular.module('ehApp')
           headers: {
             Authorization: Auth.getToken()
           }
+        },
+        validate: {
+          url: '/api/products/validate',
+          method:'POST',
+          isArray: false,
+          headers: {
+            Authorization: Auth.getToken()
+          }
         }
       });
 }]);

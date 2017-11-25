@@ -24,4 +24,15 @@ angular.module('ehApp')
       }
     }
 
+    $scope.validate = function(){
+        $scope.disabled = true;
+        ProductsService.validate({}, $scope.item, function(result){
+          $scope.validating = false;
+          $scope.validation = result
+        }, function(err){
+          console.log(err)
+        })
+    }
+
+
   });
