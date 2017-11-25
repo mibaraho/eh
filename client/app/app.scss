@@ -5,6 +5,10 @@
   margin-bottom: 10px;
 }
 
+.w200px {
+  width: 200px;
+  display: inline-block;
+}
 
 a.no-style:link {
     text-decoration: inherit;
@@ -20,6 +24,9 @@ a.no-style:visited {
 
 .cb {
   clear: both;
+}
+.thumbnail {
+  width:100%;
 }
 
 $icon-font-path: "../bower_components/bootstrap-sass-official/vendor/assets/fonts/bootstrap/";

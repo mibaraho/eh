@@ -3,6 +3,13 @@
 <div class="col-md-12">
   <div class="col-md-12 mb-10">
     <div class="text-right">
+      <div class="w200px">
+        <div ng-if="action == 'create'">
+          <select id="category" name="categories" class="form-control" ng-model="example.code" ng-options="example.code as example.name for example in examples" ng-change="exampleChanged()" data-placeholder-text-single="Seleccionar" no-results-text="No hay" chosen>
+            <option value="">Seleccionar Ejemplo</option>
+          </select>
+        </div>
+      </div>
       <span ng-click="validate()" class="btn btn-warning">Validar</span>
       <span ng-click="reject()" class="btn btn-danger" ng-if="currentUser.role == 'admin'">Rechazar</span>
       <span ng-click="approve()" class="btn btn-success" ng-if="currentUser.role == 'admin'">Aprobar</span>
@@ -54,6 +61,7 @@
                 <label for="photo_name">Foto 1</label>
                 <input ng-model="item.ProductImages[0].name" id="photo_name" name="photo_name" type="text" placeholder="Zapatilla" class="form-control input-md mb-5">
                 <input ng-model="item.ProductImages[0].url" id="url" name="url" type="text" placeholder="www.misfotos.com/zapatilla-nike-1.png" class="form-control input-md">
+                <img class="thumbnail" ng-src="{{item.ProductImages[0].url}}"/>
               </div>
               <!-- Text input-->
               <div class="form-group">
@@ -86,13 +94,46 @@
           rz-slider-options="slider.options"></rzslider>
         </div>
 
-      <div class="alert alert-success">
-        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-        <strong>¡Atención!.</strong> Al parecer tienes uno o más errores ortográficos:
-        <div class="cb"></div>
-        En el nombre del producto, donde dice "{{validation.name.spellCheck}}"
+        <div ng-if="validation.name.spellCheck.flaggedTokens.length" class="alert alert-warning">
+          <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+          <strong>¡Atención!.</strong> Al parecer tienes uno o más errores ortográficos en el nombre del producto:
+          <div class="cb"></div>
+          <div ng-repeat="err in validation.name.spellCheck.flaggedTokens">
+            Donde dice <strong>{{err.token}}</strong> te sugerimos usar <strong>{{err.suggestions[0].suggestion}}</strong>
+          </div>
+        </div>
+        <div ng-if="validation.description.spellCheck.flaggedTokens.length" class="alert alert-warning">
+          <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+          <strong>¡Atención!.</strong> Al parecer tienes uno o más errores ortográficos en la descripción del producto:
+          <div class="cb"></div>
+          <div ng-repeat="err in validation.description.spellCheck.flaggedTokens">
+            Donde dice <strong>{{err.token}}</strong> te sugerimos usar <strong>{{err.suggestions[0].suggestion}}</strong>
+          </div>
+        </div>
+        <div ng-if="validation" class="alert alert-warning">
+          <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+          <strong>¡Atención!.</strong> Verifica que el nombre, la descripción y las imágenes estén relacionadas:
+          <div class="cb"></div>
+          En el nombre del producto hablas de:
+          <span ng-repeat="key in validation.name.keyPhrase.documents[0].keyPhrases">
+            <strong>{{key}}</strong>
+            <span ng-if="$index < validation.name.keyPhrase.documents[0].keyPhrases.length-1">,</span>
+          </span>
+        </br>
+          En la descripción del producto hablas de:
+          <span ng-repeat="key in validation.description.keyPhrase.documents[0].keyPhrases">
+            <strong>{{key}}</strong>
+            <span ng-if="$index < validation.description.keyPhrase.documents[0].keyPhrases.length-1">,</span>
+          </span>
+        </br>
+          En las imágenes se muestran 
+          <span ng-repeat="key in validation.imagenValidations[0].analysis.description.tags">
+            <strong>{{key}}</strong>
+            <span ng-if="$index < validation.imagenValidations[0].analysis.description.tags.length - 1">,</span>
+          </span>
+        </div>
       </div>
-      </div>
+
       {{ validation | json }}
 
     </div>

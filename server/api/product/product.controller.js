@@ -263,7 +263,7 @@ function imagenValidations(productImages){
   var promises = []
   var imageneValidations = []
   _.each(productImages, function(_productImage){
-    var promise = callComputerVisionService(_productImage.url,config.azureCredentials.computerVisionAnalytics, 'es')
+    var promise = callComputerVisionService(_productImage.url,config.azureCredentials.computerVisionAnalytics, 'en')
     .then(function(imageneValidationReult){
       imageneValidations.push({
         ProductImageId: _productImage._id,
