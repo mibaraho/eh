@@ -15,6 +15,7 @@ var Promise = require('promise');
 var rp = require('request-promise');
 import config from '../../config/environment';
 var https = require ('https');
+var cognitiveServices = require('cognitive-services');
 
 function respondWithResult(res, statusCode) {
   statusCode = statusCode || 200;
@@ -265,9 +266,27 @@ function imagenValidations(productImages){
   _.each(productImages, function(_productImage){
     var promise = callComputerVisionService(_productImage.url,config.azureCredentials.computerVisionAnalytics, 'en')
     .then(function(imageneValidationReult){
-      imageneValidations.push({
-        ProductImageId: _productImage._id,
-        analysis: imageneValidationReult
+      return callTextTranslatorService(imageneValidationReult.description.tags,'en','es', config.azureCredentials.translatorText)
+      .then(function(translatedTags){
+        var captionPromises = []
+        _.each(imageneValidationReult.description.captions, function(_caption){
+          var captionPromise = callTextTranslatorService(_caption.text,'en','es', config.azureCredentials.translatorText)
+          .then(function(_captionTranslatedText){
+            _caption.text = _captionTranslatedText[0][0]
+            return _captionTranslatedText
+          })
+          captionPromises.push(captionPromise)
+
+        })
+        return Promise.all(captionPromises)
+        .then(function(translatedCaptions){
+          console.log(translatedCaptions)
+          imageneValidationReult.description.tags = translatedTags
+          imageneValidations.push({
+            ProductImageId: _productImage._id,
+            analysis: imageneValidationReult
+          })
+        })
       })
     })
     promises.push(promise)
@@ -381,7 +400,33 @@ function callTextAnalyticKeyPhraseService(text, credentials, mkt){
   return callTextAnalyticsService(text, credentials, 'keyPhrases', mkt)
 }
 
+function callTextTranslatorService(text,from, to, credentials, mkt){
+  console.log("tranlate "+text)
+  const client = new cognitiveServices.textTranslator({
+      apiKey: config.azureCredentials.translatorText.key,
+      endpoint: config.azureCredentials.translatorText.host
+  });
+  if(!_.isArray(text)){
+    text = [text]
+  }
+  const body = {
+      from: from,
+      to: to,
+      sourceTexts: text,
+      contentType: "text/plain"
+  }
 
+  return client.translateArray({
+      body
+  }).then(response => {
+
+    return _.map(response, function(_translation){
+      return _translation.TranslatedText
+    })
+
+  })
+
+}
 
 function callTextAnalyticsService(text, credentials, type, mkt){
   return new Promise(function(fulfill, reject){
@@ -470,3 +515,4 @@ function callBingSpellCheckService(text, credentials, mkt){
     }
   })
 }
+

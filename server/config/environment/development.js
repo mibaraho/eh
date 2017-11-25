@@ -21,7 +21,7 @@ module.exports = {
         key: '43583b23dd4e44429f86adcbc4509ee7'
      },
     translatorText:{
-      host: 'api.cognitive.microsoft.com',
+      host: 'api.microsofttranslator.com',
       path: '/sts/v1.0',
       key: 'fd9fb49e9a0b483bad062fc74027a3a3'
     },
