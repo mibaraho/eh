@@ -17,6 +17,11 @@ function onConnect(socket) {
   });
 
   // Insert sockets below
+  require('../api/validation-policy-interval/validation-policy-interval.socket').register(socket);
+  require('../api/product-image/product-image.socket').register(socket);
+  require('../api/merchant/merchant.socket').register(socket);
+  require('../api/product-message/product-message.socket').register(socket);
+  require('../api/product/product.socket').register(socket);
   require('../api/thing/thing.socket').register(socket);
 
 }

@@ -9,6 +9,11 @@ import path from 'path';
 
 export default function(app) {
   // Insert routes below
+  app.use('/api/validation-policy-intervals', require('./api/validation-policy-interval'));
+  app.use('/api/product-images', require('./api/product-image'));
+  app.use('/api/merchants', require('./api/merchant'));
+  app.use('/api/product-messages', require('./api/product-message'));
+  app.use('/api/products', require('./api/product'));
   app.use('/api/things', require('./api/thing'));
   app.use('/api/users', require('./api/user'));
 
