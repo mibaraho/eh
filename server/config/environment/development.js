@@ -29,6 +29,11 @@ module.exports = {
       host: 'brazilsouth.api.cognitive.microsoft.com',
       path: '/text/analytics/v2.0',
       key: '38618e5611c548d58f072f2dce37eddc'
+    },
+    computerVisionAnalytics :{
+      host: 'brazilsouth.api.cognitive.microsoft.com',
+      path: '/vision/v1.0/analyze',
+      key: '2f4aa7f843bf4d10a5c3d737c69414e0'
     }
   }
 }

@@ -59,6 +59,7 @@ function handleError(res, statusCode) {
   statusCode = statusCode || 500;
   return function(err) {
     console.log(JSON.stringify(err))
+    console.log(err.stack)
     res.status(statusCode).send(err);
   };
 }
@@ -234,7 +235,8 @@ function azureProductValidation(){
   return function(bundle){
     var promises = [
       nameValidation(bundle.product.name),
-      descriptionValidation(bundle.product.description)
+      descriptionValidation(bundle.product.description),
+      imagenValidations(bundle.product.ProductImages)
     ]
 
     return Promise.all(promises)
@@ -242,7 +244,8 @@ function azureProductValidation(){
       bundle.validations = [
         {
           name: azureProductValidationResults[0],
-          description: azureProductValidationResults[1]
+          description: azureProductValidationResults[1],
+          imagenValidations: azureProductValidationResults[2]
         }
       ]
       return bundle
@@ -255,7 +258,75 @@ function nameValidation(productName){
 }
 function descriptionValidation(producDescription){
   return validateProductProperty(producDescription)
-} 
+}
+
+function imagenValidations(productImages){
+  var promises = []
+  var imageneValidations = []
+  _.each(productImages, function(_productImage){
+    var promise = callComputerVisionService(_productImage.url,config.azureCredentials.computerVisionAnalytics, 'es')
+    .then(function(imageneValidationReult){
+      imageneValidations.push({
+        ProductImageId: _productImage._id,
+        analysis: imageneValidationReult
+      })
+    })
+    promises.push(promise)
+    
+  })
+  return Promise.all(promises)
+  .then(function(imageneValidationReults){
+
+    return imageneValidations
+  })
+}
+
+function callComputerVisionService(imageUrl, credentials, mkt){
+  return new Promise(function(fulfill, reject){
+    try{
+      let query_string = "?language=" + mkt + "&visualFeatures=Categories,Description,Color";
+      let response_handler = function (response) {
+          let body = '';
+          response.on ('data', function (d) {
+              body += d;
+          });
+          response.on ('end', function () {
+              let body_ = JSON.parse (body);
+              fulfill(body_)
+          });
+          response.on ('error', function (e) {
+              console.log ('Error: ' + e.message);
+              reject(e)
+          });
+      };
+
+
+      let body = JSON.stringify ({url: imageUrl});
+
+
+      let request_params = {
+          method : 'POST',
+          hostname : credentials.host,
+          path : credentials.path + query_string,
+          headers : {
+              'Ocp-Apim-Subscription-Key' : credentials.key,
+          }
+      };
+      console.log('request_params')
+      console.log(request_params)
+      console.log('body')
+      console.log(body)
+
+      let req = https.request (request_params, response_handler);
+      req.write (body);
+      req.end ();
+
+
+    }catch(err){
+      reject(err)
+    }
+  })
+}
 
 function validateProductProperty(productProperty){
   return callTextAnalyticsLanguageDetectionService(productProperty, config.azureCredentials.textAnalytics)
