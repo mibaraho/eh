@@ -44,6 +44,8 @@ angular.module('ehApp')
           } else {
             array.push(item);
           }
+          console.log(array)
+          array = _.orderBy(array, ['createdAt'], ['desc']);
 
           cb(event, item, array);
         });

@@ -13,7 +13,7 @@ export default function(app) {
   app.use('/api/product-images', require('./api/product-image'));
   app.use('/api/merchants', require('./api/merchant'));
   app.use('/api/product-messages', require('./api/product-message'));
-  app.use('/api/products', require('./api/product'));
+  app.use('/api', require('./api/product'));
   app.use('/api/things', require('./api/thing'));
   app.use('/api/users', require('./api/user'));
 

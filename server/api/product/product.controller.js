@@ -54,13 +54,18 @@ function handleEntityNotFound(res) {
 function handleError(res, statusCode) {
   statusCode = statusCode || 500;
   return function(err) {
+    console.log(err)
     res.status(statusCode).send(err);
   };
 }
 
 // Gets a list of Products
 export function index(req, res) {
-  Product.findAll()
+  Product.findAll({
+      order:[
+        ['createdAt' , 'DESC']
+      ],
+  })
     .then(respondWithResult(res))
     .catch(handleError(res));
 }
@@ -89,7 +94,7 @@ export function update(req, res) {
   if (req.body._id) {
     delete req.body._id;
   }
-  Product.find({
+  return Product.find({
     where: {
       _id: req.params.id
     }
@@ -98,6 +103,50 @@ export function update(req, res) {
     .then(saveUpdates(req.body))
     .then(respondWithResult(res))
     .catch(handleError(res));
+}
+// Updates an existing Product in the DB
+export function approve(req, res) {
+  if (req.body._id) {
+    delete req.body._id;
+  }
+  return Product.find({
+    where: {
+      _id: req.params.id
+    }
+  })
+    .then(handleEntityNotFound(res))
+    .then(initializeBundle())
+    .then(sendProductToRemote())
+    .then(updateProductWithRemoteResponse())
+    .then(respondWithResult(res))
+    .catch(handleError(res));
+}
+function initializeBundle(req, res) {
+  return function(product){
+    var bundle = {
+      product: product
+    }
+    return bundle
+  }
+}
+
+function sendProductToRemote(req, res) {
+  return function(bundle){
+    return bundle
+  }
+}
+function updateProductWithRemoteResponse(req, res) {
+  return function(bundle){
+    bundle.response = {id: 1}
+    var _update = {
+      validationStatus: 'accepted',
+      content: JSON.stringify(bundle.response)
+    }
+    return bundle.product.updateAttributes(_update)
+      .then(updated => {
+        return bundle;
+      });
+  }
 }
 
 // Deletes a Product from the DB

@@ -17,6 +17,8 @@ export default function(sequelize, DataTypes) {
     category: DataTypes.STRING(2047),
     code: DataTypes.STRING(2047),
     description: DataTypes.TEXT,
+    content: DataTypes.TEXT,
+    price: DataTypes.DOUBLE,
     status: {
       allowNull: false,
       defaultValue: 'created',
