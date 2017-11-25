@@ -32,7 +32,7 @@ module.exports = {
     },
     computerVisionAnalytics :{
       host: 'brazilsouth.api.cognitive.microsoft.com',
-      path: '/vision/v1.0/analyze',
+      path: '/vision/v1.0',
       key: '2f4aa7f843bf4d10a5c3d737c69414e0'
     }
   }

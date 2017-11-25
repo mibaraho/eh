@@ -264,7 +264,8 @@ function imagenValidations(productImages){
   var promises = []
   var imageneValidations = []
   _.each(productImages, function(_productImage){
-    var promise = callComputerVisionService(_productImage.url,config.azureCredentials.computerVisionAnalytics, 'en')
+    var imageneValidation = {}
+    var promise = callComputerVisionService(_productImage.url,config.azureCredentials.computerVisionAnalytics, 'en', 'analyze')
     .then(function(imageneValidationReult){
       return callTextTranslatorService(imageneValidationReult.description.tags,'en','es', config.azureCredentials.translatorText)
       .then(function(translatedTags){
@@ -282,13 +283,31 @@ function imagenValidations(productImages){
         .then(function(translatedCaptions){
           console.log(translatedCaptions)
           imageneValidationReult.description.tags = translatedTags
-          imageneValidations.push({
-            ProductImageId: _productImage._id,
-            analysis: imageneValidationReult
-          })
+          imageneValidation.ProductImageId = _productImage._id
+          imageneValidation.analysis = imageneValidationReult
+          return translatedCaptions
         })
       })
     })
+    .then(function(){
+      return callComputerVisionService(_productImage.url,config.azureCredentials.computerVisionAnalytics, 'en', 'ocr')
+      .then(function(textAnalysisResult){
+        imageneValidation.textAnalysis = textAnalysisResult
+        imageneValidation.textAnalysis.words = _.map(imageneValidation.textAnalysis.regions, function(_region){
+           return _.map(_region.lines, function(_line){
+             return _.map(_line.words, function(_word){
+                return _word.text
+             })
+          })
+        })
+        return textAnalysisResult
+      })
+    })
+    .then(function(finalResult){
+          imageneValidations.push(imageneValidation)
+    })
+
+    //image phase 2
     promises.push(promise)
     
   })
@@ -299,10 +318,10 @@ function imagenValidations(productImages){
   })
 }
 
-function callComputerVisionService(imageUrl, credentials, mkt){
+function callComputerVisionService(imageUrl, credentials, mkt, type){
   return new Promise(function(fulfill, reject){
     try{
-      let query_string = "?language=" + mkt + "&visualFeatures=Categories,Description,Color";
+      let query_string = "?language=" + mkt + "&visualFeatures=Categories,Description,Color&detectOrientation=true";
       let response_handler = function (response) {
           let body = '';
           response.on ('data', function (d) {
@@ -325,7 +344,7 @@ function callComputerVisionService(imageUrl, credentials, mkt){
       let request_params = {
           method : 'POST',
           hostname : credentials.host,
-          path : credentials.path + query_string,
+          path : credentials.path +'/' + type + query_string,
           headers : {
               'Ocp-Apim-Subscription-Key' : credentials.key,
           }
