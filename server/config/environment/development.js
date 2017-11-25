@@ -13,7 +13,7 @@ module.exports = {
   },
 
   // Seed database on startup
-  seedDB: false,
+  seedDB: true,
   azureCredentials:{
      spellCheck: {
         host: 'api.cognitive.microsoft.com',

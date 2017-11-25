@@ -216,6 +216,7 @@ export function validate(req, res) {
   return Promise.resolve()
   .then(initializeBundleWithProduct(req.body))
   .then(azureProductValidation())
+  .then(approvalLevel())
   .then(prepareValidationResponse())
   .then(respondWithResult(res))
   .catch(handleError(res));
@@ -293,10 +294,11 @@ function imagenValidations(productImages){
       return callComputerVisionService(_productImage.url,config.azureCredentials.computerVisionAnalytics, 'en', 'ocr')
       .then(function(textAnalysisResult){
         imageneValidation.textAnalysis = textAnalysisResult
-        imageneValidation.textAnalysis.words = _.map(imageneValidation.textAnalysis.regions, function(_region){
-           return _.map(_region.lines, function(_line){
-             return _.map(_line.words, function(_word){
-                return _word.text
+        imageneValidation.textAnalysis.words = []
+         _.each(imageneValidation.textAnalysis.regions, function(_region){
+            _.each(_region.lines, function(_line){
+              _.each(_line.words, function(_word){
+                 imageneValidation.textAnalysis.words.push(_word.text)
              })
           })
         })
@@ -535,3 +537,47 @@ function callBingSpellCheckService(text, credentials, mkt){
   })
 }
 
+
+function approvalLevel(){
+  return function(bundle){
+
+    var productDescriptionCountWords = countWords(bundle.product.description)
+    var productDecriptionGrammaticalErrors = bundle.validations.description.spellCheck && bundle.validations.description.spellCheck.flaggedTokens? bundle.validations.description.spellCheck.flaggedTokens.length: 0
+    var descriptionApprovalLevel = 1 - (productDecriptionGrammaticalErrors / productDescriptionCountWords)
+    var imageApprovalLevel = 1
+    if(!_.isEmpty(bundle.validations.imagenValidations)){
+      var productImageValidation = _.first(bundle.product.imagenValidations)
+      var wordsInTheImage = []
+
+      if(!_.isEmpty(bundle.validations.imagenValidations[0].textAnalysis.words)){
+        wordsInTheImage = wordsInTheImage.concat(bundle.validations.imagenValidations[0].textAnalysis.words)
+      }
+      if(!_.isEmpty(bundle.validations.imagenValidations[0].analysis.description.tags)){
+        var tags  = _.map(bundle.validations.imagenValidations[0].analysis.description.tags, function(_tag){
+          return _tag[0]
+        })
+        wordsInTheImage = wordsInTheImage.concat(tags)
+        console.log(wordsInTheImage)
+        imageApprovalLevel = 0
+        _.each(wordsInTheImage, function(wordInImage){
+          console.log('wordInImage')
+          console.log(wordInImage)
+          if(bundle.product.description.toLowerCase().includes(wordInImage.toLowerCase())){
+            console.log('image contains image word!!!')
+            imageApprovalLevel = 1
+          }
+        })
+
+      }
+
+    }
+    console.log('*** wordsInTheImage ***')
+    console.log(wordsInTheImage)
+    bundle.validations.approvalLevel =((descriptionApprovalLevel + imageApprovalLevel) / 2) * 100
+    return bundle
+  }
+}
+function countWords(str) {
+  var matches = str.match(/[\w\d]+/gi);
+  return matches ? matches.length : 0;
+}
