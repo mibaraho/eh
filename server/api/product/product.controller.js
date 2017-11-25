@@ -66,6 +66,32 @@ function handleError(res, statusCode) {
 }
 
 // Gets a list of Products
+export function search(req, res) {
+
+      var options = {
+          method: 'GET',
+          uri: 'http://www.falabella.com/falabella-cl/search',
+          qs: {
+            format: 'json',
+            Ntt: req.query.term
+          },
+          json: true // Automatically parses the JSON string in the response
+      };
+    
+    return rp(options)
+    .then(function(result){
+      if(!_.isNil(result.contents[0])) {
+      return _.map(result.contents[0].mainSection[1].contents[0].JSON.searchItemList.resultList, function(item){ return _.pick(item, 'productId', 'brand', 'skuId', 'url', 'prices', 'title')})
+      } else {
+        return []
+      }
+    })
+    .then(respondWithResult(res))
+    .catch(handleError(res));
+}
+
+
+// Gets a list of Products
 export function index(req, res) {
   Product.findAll({
       order:[

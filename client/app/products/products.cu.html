@@ -126,16 +126,13 @@
             <span ng-if="$index < validation.description.keyPhrase.documents[0].keyPhrases.length-1">,</span>
           </span>
         </br>
-          En las imágenes se muestran 
+          En las imágenes se muestran:
           <span ng-repeat="key in validation.imagenValidations[0].analysis.description.tags">
-            <strong>{{key}}</strong>
+            <strong>{{key[0]}}</strong>
             <span ng-if="$index < validation.imagenValidations[0].analysis.description.tags.length - 1">,</span>
           </span>
         </div>
       </div>
-
-      {{ validation | json }}
-
     </div>
     <div class="col-md-4">
       <div class="col-md-12">

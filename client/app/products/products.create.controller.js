@@ -35,7 +35,17 @@ angular.module('ehApp')
           console.log(err)
         })
     }
+    var getItems = function(page) {
+      $scope.pendingActions = true;
+      ProductsService.search({ term : $scope.item.name }).$promise.then(function(result){
+        $scope.search = result;
+      }, function(err){
 
+        $scope.error = true;
+        $scope.pendingActions = false;
+
+      });
+    }
     $scope.examples = [{
           code: 1,
           name: "Sapatos Vlancos",
@@ -59,6 +69,18 @@ angular.module('ehApp')
           ProductImages: [{
             name: "Computador",
             url: "https://http2.mlstatic.com/computador-moderno-memoria-4giga-320gb-wifi-lcd17-1-ano-gtia-D_NQ_NP_20216-MCO20186894286_102014-O.jpg"
+          }]
+        }, {
+          code: 3,
+          name: "Zapatillas Deportivas Nike",
+          model: "Runner",
+          brand: "Nike",
+          price: 59990,
+          stock: 180,
+          description: "Increibles zapatillas para trotar, correr y hacer deportes en general. Con estas zapatillas puedes enfrentar cualquier tipo de desafío deportivo, asegurando tu tranquilidad. Estas zapatillas son realmente buenas",
+          ProductImages: [{
+            name: "Zapatilla Deportiva",
+            url: "https://www.runnea.com/archivos/201601/runnea-rebajas-invierno-2016-vomero10-840x485x80.jpg?0"
           }]
         }
 

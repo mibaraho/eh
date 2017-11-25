@@ -20,6 +20,14 @@ angular.module('ehApp')
             Authorization: Auth.getToken()
           }
         },
+        search: {
+          url: '/api/products/search',
+          method:'GET',
+          isArray: true,
+          headers: {
+            Authorization: Auth.getToken()
+          }
+        },
         create: {
           url: '/api/m/:id/products',
           method:'POST',

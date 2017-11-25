@@ -9,6 +9,7 @@ import * as auth from '../../auth/auth.service';
 var router = express.Router();
 
 router.get('/m/:id/products', auth.isAuthenticated(), controller.index);
+router.get('/products/search', controller.search);
 router.get('/products/:id', auth.isAuthenticated(), controller.show);
 router.post('/m/:id/products', auth.isAuthenticated(), controller.create);
 router.put('/products/:id', auth.isAuthenticated(), controller.update);
