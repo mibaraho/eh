@@ -14,6 +14,7 @@ import {Product} from '../../sqldb';
 var Promise = require('promise');
 var rp = require('request-promise');
 import config from '../../config/environment';
+var https = require ('https');
 
 function respondWithResult(res, statusCode) {
   statusCode = statusCode || 200;
@@ -232,23 +233,53 @@ function initializeBundleWithProduct(product){
 function azureProductValidation(){
   return function(bundle){
     var promises = [
-      spellingNameValidation(bundle.product),
-      spellingDescriptionValidation(bundle.product)
+      nameValidation(bundle.product.name),
+      descriptionValidation(bundle.product.description)
     ]
 
     return Promise.all(promises)
     .then(function(azureProductValidationResults){
-      bundle.validations = _.concat(bundle.validations, azureProductValidationResults)
+      bundle.validations = [
+        {
+          name: azureProductValidationResults[0],
+          description: azureProductValidationResults[1]
+        }
+      ]
       return bundle
     })
   }
 }
 
-function spellingNameValidation(product){
-  return Promise.resolve()
+function nameValidation(productName){
+  return validateProductProperty(productName)
 }
-function spellingDescriptionValidation(product){
-return callBingSpellCheckService(product.description)
+function descriptionValidation(producDescription){
+  return validateProductProperty(producDescription)
+} 
+
+function validateProductProperty(productProperty){
+  return callTextAnalyticsLanguageDetectionService(productProperty, config.azureCredentials.textAnalytics)
+  .then(function(languageDetectionResult){
+    var languageDetected =_.last(_.sortBy(languageDetectionResult.documents[0].detectedLanguages, function(_detectedLanguage){
+      return _detectedLanguage.score
+    }))
+    console.log('*languageDetected*')
+    console.log(languageDetected)
+    var promises = [
+      callBingSpellCheckService(productProperty, config.azureCredentials.spellCheck, languageDetected.iso6391Name),
+      callTextAnalyticSentimentService(productProperty, config.azureCredentials.textAnalytics, languageDetected.iso6391Name),
+      callTextAnalyticKeyPhraseService(productProperty, config.azureCredentials.textAnalytics, languageDetected.iso6391Name)
+    ]
+    return Promise.all(promises)
+    .then(function(descriptionValidationResponses){
+      return {
+        languageDetection:  languageDetectionResult,
+        spellCheck:  descriptionValidationResponses[0],
+        sentiment:  descriptionValidationResponses[1],
+        keyPhrase:  descriptionValidationResponses[2],
+      }
+    })
+  })
 }
 
 function prepareValidationResponse(){
@@ -258,23 +289,114 @@ function prepareValidationResponse(){
 }
 
 
-function callBingSpellCheckService(text){
-  var mkt = "es";
-  var mode = "proof";
-  var query_string = "mkt=" + mkt + "&mode=" + mode;
-    var options = {
-        method: 'POST',
-        uri: config.azureCredentias.host,
-        qs: {
-            mkt: mkt,
-            mode: mode
-        },
-        body: text,
-        json: true // Automatically parses the JSON string in the response
-    };
-  
-  return rp(options)
-  .then(function(result){
-    return result
+/*
+function callTextAnalyticsLanguagesService(text){
+  return new Promise(function(fulfill, reject){
+    try{
+
+    }catch(err){
+      reject(err)
+    }
+  })
+}
+*/
+
+function callTextAnalyticsLanguageDetectionService(text, credentials){
+  return callTextAnalyticsService(text, credentials, 'languages')
+}
+function callTextAnalyticSentimentService(text, credentials, mkt){
+  return callTextAnalyticsService(text, credentials, 'sentiment', mkt)
+}
+function callTextAnalyticKeyPhraseService(text, credentials, mkt){
+  return callTextAnalyticsService(text, credentials, 'keyPhrases', mkt)
+}
+
+
+
+function callTextAnalyticsService(text, credentials, type, mkt){
+  return new Promise(function(fulfill, reject){
+    try{
+
+      let response_handler = function (response) {
+          let body = '';
+          response.on ('data', function (d) {
+              body += d;
+          });
+          response.on ('end', function () {
+              let body_ = JSON.parse (body);
+              fulfill(body_)
+          });
+          response.on ('error', function (e) {
+              console.log ('Error: ' + e.message);
+              reject(e)
+          });
+      };
+
+
+      let body = JSON.stringify ({
+        documents:[
+          {id: 1, text: text, language: mkt}
+        ]
+      });
+
+
+      let request_params = {
+          method : 'POST',
+          hostname : credentials.host,
+          path : credentials.path + '/' + type,
+          headers : {
+              'Ocp-Apim-Subscription-Key' : credentials.key,
+          }
+      };
+
+      let req = https.request (request_params, response_handler);
+      req.write (body);
+      req.end ();
+
+
+    }catch(err){
+      reject(err)
+    }
+  })
+}
+
+function callBingSpellCheckService(text, credentials, mkt){
+  console.log('callBingSpellCheckService')
+  return new Promise(function(fulfill, reject){
+    try{
+        let mode = "proof";
+        let query_string = "?mkt=" + mkt + "&mode=" + mode;
+        console.log('query_string')
+        console.log(query_string)
+        let request_params = {
+            method : 'POST',
+            hostname : credentials.host,
+            path : credentials.path + query_string,
+            headers : {
+                'Content-Type' : 'application/x-www-form-urlencoded',
+                'Content-Length' : text.length + 5,
+                'Ocp-Apim-Subscription-Key' : credentials.key
+            }
+        };
+
+        let response_handler = function (response) {
+            let body = '';
+            response.on ('data', function (d) {
+                body += d;
+            });
+            response.on ('end', function () {
+                fulfill(JSON.parse(body))
+            });
+            response.on ('error', function (e) {
+                reject(e)
+            });
+        };
+
+        let req = https.request (request_params, response_handler);
+        req.write ("text=" + text);
+        req.end ();
+    }catch(err){
+      reject(err)
+    }
   })
 }

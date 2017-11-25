@@ -14,8 +14,21 @@ module.exports = {
 
   // Seed database on startup
   seedDB: false,
-  azureCredentias:{
-  	 host: 'https://api.cognitive.microsoft.com/bing/v7.0/SpellCheck',
-     path: '/bing/v7.0/spellcheck'
+  azureCredentials:{
+     spellCheck: {
+        host: 'api.cognitive.microsoft.com',
+        path: '/bing/v7.0/spellcheck',
+        key: '43583b23dd4e44429f86adcbc4509ee7'
+     },
+    translatorText:{
+      host: 'api.cognitive.microsoft.com',
+      path: '/sts/v1.0',
+      key: 'fd9fb49e9a0b483bad062fc74027a3a3'
+    },
+    textAnalytics :{
+      host: 'brazilsouth.api.cognitive.microsoft.com',
+      path: '/text/analytics/v2.0',
+      key: '38618e5611c548d58f072f2dce37eddc'
+    }
   }
-};
+}
