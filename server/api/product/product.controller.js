@@ -11,6 +11,9 @@
 
 import _ from 'lodash';
 import {Product} from '../../sqldb';
+var Promise = require('promise');
+var rp = require('request-promise');
+import config from '../../config/environment';
 
 function respondWithResult(res, statusCode) {
   statusCode = statusCode || 200;
@@ -110,4 +113,75 @@ export function destroy(req, res) {
     .then(handleEntityNotFound(res))
     .then(removeEntity(res))
     .catch(handleError(res));
+}
+
+
+export function validate(req, res) {
+  return Promise.resolve()
+  .then(initializeBundleWithProduct(req.body))
+  .then(azureProductValidation())
+  .then(prepareValidationResponse())
+  .then(respondWithResult(res))
+  .catch(handleError(res));
+}
+
+function initializeBundleWithProduct(product){
+  return function(){
+    var bundle = {
+      product: product,
+      validations:[]
+    }
+    return bundle
+  }
+}
+
+
+function azureProductValidation(){
+  return function(bundle){
+    var promises = [
+      spellingNameValidation(bundle.product),
+      spellingDescriptionValidation(bundle.product)
+    ]
+
+    return Promise.all(promises)
+    .then(function(azureProductValidationResults){
+      bundle.validations = _.concat(bundle.validations, azureProductValidationResults)
+      return bundle
+    })
+  }
+}
+
+function spellingNameValidation(product){
+  return Promise.resolve()
+}
+function spellingDescriptionValidation(product){
+return callBingSpellCheckService(product.description)
+}
+
+function prepareValidationResponse(){
+  return function(bundle){
+    return bundle.validations
+  }
+}
+
+
+function callBingSpellCheckService(text){
+  var mkt = "es";
+  var mode = "proof";
+  var query_string = "mkt=" + mkt + "&mode=" + mode;
+    var options = {
+        method: 'POST',
+        uri: config.azureCredentias.host,
+        qs: {
+            mkt: mkt,
+            mode: mode
+        },
+        body: text,
+        json: true // Automatically parses the JSON string in the response
+    };
+  
+  return rp(options)
+  .then(function(result){
+    return result
+  })
 }

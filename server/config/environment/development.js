@@ -13,6 +13,9 @@ module.exports = {
   },
 
   // Seed database on startup
-  seedDB: true
-
+  seedDB: true,
+  azureCredentias:{
+  	 host: 'https://api.cognitive.microsoft.com/bing/v7.0/SpellCheck',
+     path: '/bing/v7.0/spellcheck'
+  }
 };
