@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('ehApp')
-  .controller('MerchantProductsEditCtrl', function ($scope, $state, $stateParams, ProductsService, ValidationPolicyIntervalsService,  Auth) {
+  .controller('MerchantProductsEditCtrl', function ($scope, $state, $stateParams, socket, ProductsService, ValidationPolicyIntervalsService, ProductMessagesService, Auth) {
    $scope.action = 'edit';
     $scope.item = {}
     $scope.currentUser = {}
@@ -16,6 +16,16 @@ angular.module('ehApp')
     ProductsService.get({ id: $stateParams.id }).$promise.then(function(result){
       $scope.item = result;
       $scope.pendingActions = false;
+        ProductMessagesService.list({id: $scope.item._id }).$promise.then(function(result){
+          $scope.messages = _.map(result, function(item){return JSON.parse(item.content)});
+          $scope.user =  { userId: $scope.currentUser._id , avatar: 'assets/images/person-flat.png', userName: $scope.currentUser.name };
+          socket.syncUpdates('productMessage', $scope.messages);
+        }, function(err){
+
+          $scope.error = true;
+          $scope.pendingActions = false;
+
+        });
     }, function(err){
       console.log(err)
     })
@@ -94,5 +104,13 @@ angular.module('ehApp')
           console.log(err)
         })
       }
+    }
+
+
+    $scope.send = function(message){
+      ProductMessagesService.create({ id: $scope.item._id }, message, function(result){
+      }, function(err){
+        console.log(err)
+      })
     }
   });

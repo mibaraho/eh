@@ -72,6 +72,18 @@
           rz-slider-high="slider.maxValue"
           rz-slider-options="slider.options"></rzslider>
         </div>
+        <div class="cb"></div>
+        <div ng-show="action == 'edit'">
+        <simple-chat ng-if="user"
+            messages="messages"
+            local-user="user",
+            show-user-avatar="true",
+            show-bubble-infos="false",
+            send-function="send",
+            send-button-text="Enviar",
+            composer-placeholder-text="Escribe aquí..."
+        ></simple-chat>
+        </div>
       </div>
     </div>
   </div>
