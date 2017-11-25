@@ -1,0 +1,78 @@
+<navbar></navbar>
+
+<div class="container">
+  <div class="row" ng-if="currentUser.role == 'admin'">
+    <div class="text-right">
+      <span ng-click="reject()" class="btn btn-danger">Rechazar</span>
+      <span ng-click="approve()" class="btn btn-success">Aprobar</span>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <div class="col-md-12">
+          <form role="form" name="form" ng-submit="submit()" novalidate class="form-validation">
+            <fieldset  ng-disabled="disabled">
+              <!-- Text input-->
+              <div class="form-group">
+                <label for="name">Nombre</label>
+                <input ng-model="item.name" id="name" name="name" type="text" placeholder="Zapatilla Nike" class="form-control input-md" required>
+              </div>
+              <!-- Text input-->
+              <div class="form-group">
+                <label for="model">Modelo</label>
+                <input ng-model="item.model" id="model" name="model" type="text" placeholder="Runner" class="form-control input-md" required>
+              </div>
+              <!-- Text input-->
+              <div class="form-group">
+                <label for="brand">Marca</label>
+                <input ng-model="item.brand" id="brand" name="brand" type="text" placeholder="Nike" class="form-control input-md" >
+              </div>
+              <!-- Text input-->
+              <div class="form-group">
+                <label for="price">Precio</label>
+                <div class="input-group">
+                  <div class="input-group-addon">$</div>
+                  <input ng-model="item.price" type="text" class="form-control" id="price" placeholder="9990">
+                </div>
+              </div>
+              <!-- Text input-->
+              <div class="form-group">
+                <label for="stock">Stock</label>
+                <div class="input-group">
+                  <div class="input-group-addon">u</div>
+                  <input ng-model="item.stock" type="text" class="form-control" id="stock" placeholder="100">
+                </div>
+              </div>
+              <!-- Textarea -->
+              <div class="form-group">
+                <label for="description">Descripción</label>
+                <textarea ng-model="item.description" class="form-control" id="description" name="description"></textarea>
+              </div>
+              <!-- Text input-->
+              <div class="form-group">
+                <label for="photo_name">Foto 1</label>
+                <input ng-model="item.photos[0]['name']" id="photo_name" name="photo_name" type="url" placeholder="Zapatilla h" class="form-control input-md mb-5">
+                <input ng-model="item.photos[0]['url']" id="url" name="url" type="url" placeholder="www.misfotos.com/zapatilla-nike-1.png" class="form-control input-md">
+              </div>
+
+              <!-- Button (Double) -->
+              <div class="form-group">
+                <div class="text-right">
+                  <button type="submit" id="save" name="save" class="btn btn-primary">Guardar</button>
+                </div>
+              </div>
+            </fieldset>
+          </form>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="col-md-12">
+        <div ng-show="action == 'edit'">
+          <rzslider rz-slider-model="slider.minValue"
+          rz-slider-high="slider.maxValue"
+          rz-slider-options="slider.options"></rzslider>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

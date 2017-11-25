@@ -3,7 +3,7 @@
  */
 
 'use strict';
-
+import _ from 'lodash';
 var ProductEvents = require('./product.events');
 
 // Model events to emit
@@ -23,6 +23,8 @@ export function register(socket) {
 
 function createListener(event, socket) {
   return function(doc) {
+    doc = doc.get()
+    doc.content =  _.isEmpty(doc.content) ? doc.content : JSON.parse(doc.content)
     socket.emit(event, doc);
   };
 }

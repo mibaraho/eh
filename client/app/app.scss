@@ -1,3 +1,20 @@
+.mb-5 {
+  margin-bottom: 5px;
+}
+
+
+a.no-style:link {
+    text-decoration: inherit;
+    color: inherit !important;
+    cursor: auto;
+}
+
+a.no-style:visited {
+    text-decoration: inherit;
+    color: inherit !important;
+    cursor: auto;
+}
+
 $icon-font-path: "../bower_components/bootstrap-sass-official/vendor/assets/fonts/bootstrap/";
 @import '../bower_components/bootstrap-sass-official/vendor/assets/stylesheets/bootstrap';
 @import '../bower_components/bootstrap-social/bootstrap-social.scss';

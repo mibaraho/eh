@@ -1,1 +1,42 @@
-<div>This is the products view.</div>
+<navbar></navbar>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h1>Productos</h1>
+    </div>
+    <table class="table">
+      <tr>
+        <th>Nombre</th>
+        <th>Modelo</th>
+        <th>Marca</th>
+        <th>Precio</th>
+        <th>Status</th>
+        <th>Id Falabella</th>
+        <th>Acción</th>
+      </tr>
+      <tr ng-repeat="product in products">
+        <td>{{product.name}}</td>
+        <td>{{product.model}}</td>
+        <td>{{product.brand}}</td>
+        <td>${{product.price}}</td>
+        <td>
+          <span class="label label-success" ng-show="product.validationStatus == 'accepted'">Aceptado</span>
+          <span class="label label-warning" ng-show="product.validationStatus == 'pending'">Pendiente</span>
+          <span class="label label-danger" ng-show="product.validationStatus == 'rejected'">Rechazado</span>
+        </td>
+        <td>
+          {{product.content.id}}
+        </td>
+        <td>
+          <a ui-sref="merchant-products-edit({ id: product._id })" class="no-style mr-5"><i class="fa fa-pencil"></i></a>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="row">
+    <div class="text-right">
+      <a ui-sref="merchant-products-create" class="btn btn-primary">Crear</a>
+    </div>
+  </div>
+</div>

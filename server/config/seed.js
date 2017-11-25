@@ -50,13 +50,15 @@ User.sync()
       provider: 'local',
       name: 'Test User',
       email: 'test@example.com',
-      password: 'test'
+      password: 'test',
+      MerchantId: '75c97129-c3d0-439d-9d40-a4579489898a'
     }, {
       provider: 'local',
       role: 'admin',
       name: 'Admin',
       email: 'admin@example.com',
-      password: 'admin'
+      password: 'admin',
+      MerchantId: '75c97129-c3d0-439d-9d40-a4579489898a'
     }])
     .then(() => {
       console.log('finished populating users');

@@ -58,14 +58,25 @@ function handleEntityNotFound(res) {
 function handleError(res, statusCode) {
   statusCode = statusCode || 500;
   return function(err) {
-    console.log(err.stack)
+    console.log(JSON.stringify(err))
     res.status(statusCode).send(err);
   };
 }
 
 // Gets a list of Products
 export function index(req, res) {
-  Product.findAll()
+  Product.findAll({
+      order:[
+        ['createdAt' , 'DESC']
+      ],
+  })
+    .then(function(result){
+      result = _.map(result, function(item){
+        item.content = JSON.parse(item.content)
+        return item
+      })
+      return result
+    })
     .then(respondWithResult(res))
     .catch(handleError(res));
 }
@@ -78,6 +89,10 @@ export function show(req, res) {
     }
   })
     .then(handleEntityNotFound(res))
+    .then(function(result){
+      result.content = JSON.parse(result.content)
+      return result
+    })
     .then(respondWithResult(res))
     .catch(handleError(res));
 }
@@ -94,7 +109,7 @@ export function update(req, res) {
   if (req.body._id) {
     delete req.body._id;
   }
-  Product.find({
+  return Product.find({
     where: {
       _id: req.params.id
     }
@@ -103,6 +118,83 @@ export function update(req, res) {
     .then(saveUpdates(req.body))
     .then(respondWithResult(res))
     .catch(handleError(res));
+}
+// Updates an existing Product in the DB
+export function approve(req, res) {
+  if (req.body._id) {
+    delete req.body._id;
+  }
+  return Product.find({
+    where: {
+      _id: req.params.id
+    }
+  })
+    .then(handleEntityNotFound(res))
+    .then(initializeBundle())
+    .then(sendProductToRemote())
+    .then(updateProductWithRemoteResponse())
+    .then(respondWithResult(res))
+    .catch(handleError(res));
+}
+function initializeBundle(req, res) {
+  return function(product){
+    var bundle = {
+      product: product
+    }
+    return bundle
+  }
+}
+
+function sendProductToRemote(req, res) {
+  return function(bundle){
+    var _product = {
+        brand_id: "1",
+        category_id: "1",
+        description: bundle.product.description,
+        ean: '4679946120934',
+        model: bundle.product.model,
+        name: bundle.product.name,
+        price: bundle.product.price,
+        images_attributes: [
+          {
+            name: 'Zapatilla',
+            url: 'https://www.foroatletismo.com/imagenes/2016/10/zapatilla-oro-luanvi.jpg'
+          }
+      ],
+        stock: bundle.product.stock
+      }
+
+      var options = {
+          method: 'POST',
+          uri: 'http://52.170.248.170/api/v1/products',
+          body: _product,
+          headers: {
+               'X-Company-ID': '1',
+               'content-type': 'application/json'
+          },
+          json: true // Automatically parses the JSON string in the response
+      };
+    
+    return rp(options)
+    .then(function(result){
+      bundle.response = result
+      console.log(result)
+      return bundle
+    })
+  }
+}
+function updateProductWithRemoteResponse(req, res) {
+  return function(bundle){
+    var _update = {
+      validationStatus: 'accepted',
+      content: JSON.stringify(bundle.response)
+    }
+    console.log(_update)
+    return bundle.product.updateAttributes(_update)
+      .then(updated => {
+        return bundle;
+      });
+  }
 }
 
 // Deletes a Product from the DB

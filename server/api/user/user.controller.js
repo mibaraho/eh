@@ -30,7 +30,8 @@ export function index(req, res) {
       'name',
       'email',
       'role',
-      'provider'
+      'provider',
+      'MerchantId'
     ]
   })
     .then(users => {
@@ -130,7 +131,8 @@ export function me(req, res, next) {
       'name',
       'email',
       'role',
-      'provider'
+      'provider',
+      'MerchantId'
     ]
   })
     .then(user => { // don't ever give out the password or salt
