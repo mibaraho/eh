@@ -6,13 +6,9 @@ module.exports = {
 
   // Sequelize connecton opions
   sequelize: {
-    uri: 'sqlite://',
+    uri: 'mysql://root:@127.0.0.1:3306/eh',
     options: {
-      logging: false,
-      storage: 'dev.sqlite',
-      define: {
-        timestamps: false
-      }
+      logging: false
     }
   },
 
