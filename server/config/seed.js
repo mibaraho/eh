@@ -51,14 +51,16 @@ User.sync()
       name: 'Test User',
       email: 'test@example.com',
       password: 'test',
-      MerchantId: '75c97129-c3d0-439d-9d40-a4579489898a'
+      MerchantId: '75c97129-c3d0-439d-9d40-a4579489898a',
+      avatar:'https://jira.hyperledger.org/secure/useravatar?size=xsmall&avatarId=10346'
     }, {
       provider: 'local',
       role: 'admin',
       name: 'Admin',
       email: 'admin@example.com',
       password: 'admin',
-      MerchantId: '75c97129-c3d0-439d-9d40-a4579489898a'
+      MerchantId: '75c97129-c3d0-439d-9d40-a4579489898a',
+      avatar: 'http://citimedny.com/wp-content/uploads/2016/02/flat-faces-icons-circle-6-min.png'
     }])
     .then(() => {
       console.log('finished populating users');

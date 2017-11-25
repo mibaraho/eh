@@ -11,7 +11,8 @@ angular.module('ehApp', [
   'ui.router',
   'ui.bootstrap',
   'validation.match',
-  'rzModule'
+  'rzModule',
+  'angular-simple-chat'
 ])
   .config(function($urlRouterProvider, $locationProvider) {
     $urlRouterProvider

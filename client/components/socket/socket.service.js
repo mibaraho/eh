@@ -33,6 +33,7 @@ angular.module('ehApp')
          */
         socket.on(modelName + ':save', function (item) {
           var oldItem = _.find(array, {_id: item._id});
+          oldItem = oldItem || _.find(array, {id: item.id});
           var index = array.indexOf(oldItem);
           var event = 'created';
 

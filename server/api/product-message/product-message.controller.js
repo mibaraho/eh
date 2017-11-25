@@ -60,7 +60,14 @@ function handleError(res, statusCode) {
 
 // Gets a list of ProductMessages
 export function index(req, res) {
-  ProductMessage.findAll()
+  ProductMessage.findAll({
+    where: {
+      ProductId: req.params.id
+    },
+      order:[
+        ['createdAt' , 'DESC']
+      ]
+  })
     .then(respondWithResult(res))
     .catch(handleError(res));
 }
@@ -79,7 +86,11 @@ export function show(req, res) {
 
 // Creates a new ProductMessage in the DB
 export function create(req, res) {
-  ProductMessage.create(req.body)
+  var m = {
+    content: JSON.stringify(req.body),
+    ProductId: req.params.id
+  }
+  ProductMessage.create(m)
     .then(respondWithResult(res, 201))
     .catch(handleError(res));
 }

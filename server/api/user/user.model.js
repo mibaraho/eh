@@ -37,6 +37,7 @@ module.exports = function(sequelize, DataTypes) {
     },
     provider: DataTypes.STRING,
     salt: DataTypes.STRING,
+    avatar: DataTypes.TEXT,
     facebook: DataTypes.TEXT,
     twitter: DataTypes.TEXT,
     google: DataTypes.TEXT,
