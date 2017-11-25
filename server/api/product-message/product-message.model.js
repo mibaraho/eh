@@ -26,9 +26,6 @@ export default function(sequelize, DataTypes) {
   ProductMessage.belongsTo(Product);
   Product.hasMany(ProductMessage);
 
-  var Merchant = sequelize.import('../merchant/merchant.model');
-  ProductMessage.belongsTo(Merchant);
-  Merchant.hasMany(ProductMessage);
 
   return ProductMessage;
 }

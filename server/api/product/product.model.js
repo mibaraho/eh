@@ -1,5 +1,4 @@
 'use strict';
-import * as ean13 from '../../utils/ean13'
 
 export default function(sequelize, DataTypes) {
   var Product = sequelize.define('Product', {

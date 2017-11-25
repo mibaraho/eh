@@ -25,7 +25,7 @@ export default function(sequelize, DataTypes) {
   Merchant.hasMany(Product);
 
   var ProductImage =  sequelize.import('../product-image/product-image.model');
-  Merchant.hasMany(ProductPicture);
+  Merchant.hasMany(ProductImage);
 
   var ProductMessage =  sequelize.import('../product-message/product-message.model');
   Merchant.hasMany(ProductMessage);
