@@ -19,6 +19,7 @@ export default function(sequelize, DataTypes) {
     description: DataTypes.TEXT,
     content: DataTypes.TEXT,
     price: DataTypes.DOUBLE,
+    stock: DataTypes.DOUBLE,
     status: {
       allowNull: false,
       defaultValue: 'created',

@@ -57,7 +57,7 @@ function handleEntityNotFound(res) {
 function handleError(res, statusCode) {
   statusCode = statusCode || 500;
   return function(err) {
-    console.log(err)
+    console.log(JSON.stringify(err))
     res.status(statusCode).send(err);
   };
 }
@@ -69,6 +69,13 @@ export function index(req, res) {
         ['createdAt' , 'DESC']
       ],
   })
+    .then(function(result){
+      result = _.map(result, function(item){
+        item.content = JSON.parse(item.content)
+        return item
+      })
+      return result
+    })
     .then(respondWithResult(res))
     .catch(handleError(res));
 }
@@ -81,6 +88,10 @@ export function show(req, res) {
     }
   })
     .then(handleEntityNotFound(res))
+    .then(function(result){
+      result.content = JSON.parse(result.content)
+      return result
+    })
     .then(respondWithResult(res))
     .catch(handleError(res));
 }
@@ -135,16 +146,49 @@ function initializeBundle(req, res) {
 
 function sendProductToRemote(req, res) {
   return function(bundle){
-    return bundle
+    var _product = {
+        brand_id: "1",
+        category_id: "1",
+        description: bundle.product.description,
+        ean: '4679946120934',
+        model: bundle.product.model,
+        name: bundle.product.name,
+        price: bundle.product.price,
+        images_attributes: [
+          {
+            name: 'Zapatilla',
+            url: 'https://www.foroatletismo.com/imagenes/2016/10/zapatilla-oro-luanvi.jpg'
+          }
+      ],
+        stock: bundle.product.stock
+      }
+
+      var options = {
+          method: 'POST',
+          uri: 'http://52.170.248.170/api/v1/products',
+          body: _product,
+          headers: {
+               'X-Company-ID': '1',
+               'content-type': 'application/json'
+          },
+          json: true // Automatically parses the JSON string in the response
+      };
+    
+    return rp(options)
+    .then(function(result){
+      bundle.response = result
+      console.log(result)
+      return bundle
+    })
   }
 }
 function updateProductWithRemoteResponse(req, res) {
   return function(bundle){
-    bundle.response = {id: 1}
     var _update = {
       validationStatus: 'accepted',
       content: JSON.stringify(bundle.response)
     }
+    console.log(_update)
     return bundle.product.updateAttributes(_update)
       .then(updated => {
         return bundle;

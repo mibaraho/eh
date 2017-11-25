@@ -60,7 +60,11 @@ function handleError(res, statusCode) {
 
 // Gets a list of ValidationPolicyIntervals
 export function index(req, res) {
-  ValidationPolicyInterval.findAll()
+  ValidationPolicyInterval.findAll({
+          order:[
+        ['position']
+      ]
+  })
     .then(respondWithResult(res))
     .catch(handleError(res));
 }

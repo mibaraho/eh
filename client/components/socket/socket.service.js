@@ -42,10 +42,8 @@ angular.module('ehApp')
             array.splice(index, 1, item);
             event = 'updated';
           } else {
-            array.push(item);
+            array.unshift(item);
           }
-          console.log(array)
-          array = _.orderBy(array, ['createdAt'], ['desc']);
 
           cb(event, item, array);
         });
