@@ -1,15 +1,34 @@
 'use strict';
 
 export default function(sequelize, DataTypes) {
-  return sequelize.define('ProductMessage', {
+  var ProductMessage = sequelize.define('ProductMessage', {
     _id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
       allowNull: false,
-      primaryKey: true,
-      autoIncrement: true
+      primaryKey: true
     },
-    name: DataTypes.STRING,
-    info: DataTypes.STRING,
-    active: DataTypes.BOOLEAN
+    content: DataTypes.TEXT,
+    tags: DataTypes.TEXT,
+    code: DataTypes.STRING(2047),
+    status: {
+      allowNull: false,
+      defaultValue: 'created',
+      type: DataTypes.STRING
+    }
   });
+
+  var User = sequelize.import('../user/user.model');
+  ProductMessage.belongsTo(User, { as: 'CreatedBy' });
+  ProductMessage.belongsTo(User, { as: 'UpdatedBy' });
+
+  var Product = sequelize.import('../product/product.model');
+  ProductMessage.belongsTo(Product);
+  Product.hasMany(ProductMessage);
+
+  var Merchant = sequelize.import('../merchant/merchant.model');
+  ProductMessage.belongsTo(Merchant);
+  Merchant.hasMany(ProductMessage);
+
+  return ProductMessage;
 }
